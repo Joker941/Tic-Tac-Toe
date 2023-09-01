@@ -12,67 +12,99 @@ const gameBoard = (() => {
     return { gameBoardDisposition, updateGameBoard,};
 })();
 
-const gameTours = () => {
+const gameLogic = () => {
+
+    const listenerEvent = () => {
+        let contents = document.querySelector('.container');
+
+        for (let i = 0; i <= contents.childNodes.length - 1; i++) {
+        
+            let currentNode = contents.childNodes[i];
+        
+            if (currentNode.nodeType === 1 && currentNode.textContent == '') {
+                currentNode.addEventListener('click', function() { game.gameTurn(currentNode) }); 
+            }
+        }
+    };
 
     const checkWinner = (board) => { 
 
-        if (board[0] != '' && board[0] === board[1] && board[1] === board[2]) { //OK
-            return 'ligne 1, OK';
+        if (board[0] != '' && board[0] === board[1] && board[1] === board[2]) {
+            return board[0];
         }
-        if (board[3] != '' && board[3] === board[4] && board[4] === board[5]) { // Pas OK
-            return 'ligne 2, OK';
+        if (board[3] != '' && board[3] === board[4] && board[4] === board[5]) {
+            return board[3];
         }
-        if (board[6] != '' && board[6] === board[7] && board[7] === board[8]) { // Pas OK
-            return 'ligne 3, OK';
+        if (board[6] != '' && board[6] === board[7] && board[7] === board[8]) {
+            return board[6];
         }
-        if (board[0] != '' && board[0] === board[3] && board[3] === board[6]) { //OK
-            return 'colonne 1, OK';
+        if (board[0] != '' && board[0] === board[3] && board[3] === board[6]) {
+            return board[0];
         }
-        if (board[1] != '' && board[1] === board[4] && board[4] === board[7]) { // Pas OK
-            return 'colonne 2, OK';
+        if (board[1] != '' && board[1] === board[4] && board[4] === board[7]) {
+            return board[1];
         }
-        if (board[2] != '' && board[2] === board[5] && board[5] === board[8]) { // Pas OK
-            return 'colonne 3, OK';
+        if (board[2] != '' && board[2] === board[5] && board[5] === board[8]) {
+            return board[2];
         }
-        if (board[0] != '' && board[0] === board[4] && board[4] === board[8]) { //OK
-            return 'diagonale 1, OK';
+        if (board[0] != '' && board[0] === board[4] && board[4] === board[8]) {
+            return board[0];
         }
-        if (board[6] != '' && board[6] === board[4] && board[4] === board[2]) { //OK
-            return 'diagonale 2, OK';
+        if (board[6] != '' && board[6] === board[4] && board[4] === board[2]) {
+            return board[6];
         } 
     };
 
-    return { checkWinner, };
+    const playerTurn = () => {
+
+        if (currentPlayer.tag == 'X') {
+            currentPlayer = p2;
+            document.querySelector('.player').textContent = p2.name;
+        } else if (currentPlayer.tag == 'O') {
+            currentPlayer = p1;
+            document.querySelector('.player').textContent = p1.name;
+        }
+       
+    };
+    
+    const gameTurn = (currentNode) => {
+        
+        let winner = game.checkWinner(gameBoard.gameBoardDisposition);
+        
+        if (!winner) {
+            currentNode.textContent = currentPlayer.tag;
+            let currentPosition = parseInt(currentNode.classList[1]);
+            gameBoard.updateGameBoard(currentPosition, currentPlayer.tag);
+
+            if (game.checkWinner(gameBoard.gameBoardDisposition)) {
+                console.log(game.checkWinner(gameBoard.gameBoardDisposition) + " Wins!");
+            } else {
+                game.playerTurn();
+            }
+        }
+    };
+
+    return { checkWinner, playerTurn, gameTurn, listenerEvent, };
 };
+
+const game = gameLogic();
+
+game.listenerEvent();
 
 const p1 = Player('Golio', 'X');
 
 const p2 = Player('Mongol', 'O');
 
-const game = gameTours();
+let currentPlayer = p1;
 
-let contents = document.querySelector('.container');
-
-for (let i = 0; i <= contents.childNodes.length - 1; i++) {
-
-    if (contents.childNodes[i].nodeType === 1) {
-        
-        contents.childNodes[i].addEventListener('click', () => { 
-            if (contents.childNodes[i].textContent == '') {
-                contents.childNodes[i].textContent = 'X';
-                let currentPosition = parseInt(contents.childNodes[i].classList[1]);
-                gameBoard.updateGameBoard(currentPosition, 'X');
-            }
-        });
-
-    }
-}
+document.querySelector('.player').textContent = p1.name;
 
 
-document.querySelector('.showArray').addEventListener('click', () => { 
-    for (let i = 0; i < gameBoard.gameBoardDisposition.length; i++) {
-        console.log(`Position : ${i} / valeur : ${gameBoard.gameBoardDisposition[i]}`);
-    }
-    console.log("check winner : " + game.checkWinner(gameBoard.gameBoardDisposition));
-});
+
+
+
+
+
+
+
 
